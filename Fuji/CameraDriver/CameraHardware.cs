@@ -2003,24 +2003,11 @@ namespace ASCOM.ScdouglasFujifilm.Camera
                     width = bayerDataUShort.GetLength(1);
                 }
 
-                int[,] bayerArrayInt = new int[width, height]; // ASCOM usually expects [width, height] or [X, Y]
-
-                // Check dimensions match expected camera size (optional sanity check)
+                int cropLeft, cropTop;
+                int[,] bayerArrayInt = ActiveFrameCropper.ToAscomArray(
+                    bayerDataUShort, cameraXSize, cameraYSize, out cropLeft, out cropTop);
                 if (width != cameraXSize || height != cameraYSize)
-                {
-                    LogMessage("DownloadImageData", $"WARNING: LibRaw dimensions ({width}x{height}) differ from expected ({cameraXSize}x{cameraYSize}). Using LibRaw dimensions.");
-                }
-
-                // Copy data, converting ushort to int
-                // Assuming ASCOM ImageArray wants [X, Y] which means [width, height]
-                for (int y = 0; y < height; y++) // Iterate rows (dimension 0 of C# array)
-                {
-                    for (int x = 0; x < width; x++) // Iterate columns (dimension 1 of C# array)
-                    {
-                        bayerArrayInt[x, y] = bayerDataUShort[y, x]; // Assign C#[row, col] to ASCOM[x, y]
-                    }
-                }
-                LogMessage("DownloadImageData", $"Converted ushort[,] to int[,]");
+                    LogMessage("DownloadImageData", $"Cropped LibRaw frame {width}x{height} to advertised {cameraXSize}x{cameraYSize} at ({cropLeft},{cropTop}).");
 
                 lastImageArray = bayerArrayInt; // Store the final int[,] array
 

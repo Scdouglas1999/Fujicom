@@ -118,6 +118,7 @@
     <Compile Include="CameraDriver\CameraDriver.cs" />
     <Compile Include="CameraDriver\CameraHardware.cs" />
     <Compile Include="Core\CameraConfig.cs" />
+    <Compile Include="Core\ActiveFrameCropper.cs" />
     <Compile Include="Core\CameraModelCatalog.cs" />
     <Compile Include="Core\FujifilmCapabilities.cs" />
     <Compile Include="frmMain.cs">

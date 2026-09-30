@@ -18,6 +18,7 @@ internal static class Program
             Run("shutter selection", TestShutterSelection);
             Run("camera model matching", TestCameraModelMatching);
             Run("all camera configurations", TestAllCameraConfigurations);
+            Run("active frame crop", TestActiveFrameCrop);
             Run("project XML", TestProjectXml);
             Console.WriteLine($"All {_passed} Fujicom core checks passed.");
             return 0;
@@ -141,6 +142,26 @@ internal static class Program
     {
         string project = Path.Combine(FindRepositoryRoot(), "Fuji", "Fuji.csproj");
         System.Xml.Linq.XDocument.Load(project);
+    }
+
+    private static void TestActiveFrameCrop()
+    {
+        Equal(72, ActiveFrameCropper.EvenCenteredOffset(6384, 6240));
+        Equal(10, ActiveFrameCropper.EvenCenteredOffset(4182, 4160));
+
+        var source = new ushort[8, 10];
+        for (int y = 0; y < 8; y++)
+            for (int x = 0; x < 10; x++)
+                source[y, x] = (ushort)(y * 100 + x);
+
+        var cropped = ActiveFrameCropper.ToAscomArray(source, 4, 4, out int left, out int top);
+        Equal(2, left);
+        Equal(2, top);
+        Equal(4, cropped.GetLength(0));
+        Equal(4, cropped.GetLength(1));
+        Equal(202, cropped[0, 0]);
+        Equal(505, cropped[3, 3]);
+        Throws<InvalidOperationException>(() => ActiveFrameCropper.ToAscomArray(source, 11, 4, out _, out _));
     }
 
     private static void WriteConfig(string root, string model, int minIso)
