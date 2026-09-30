@@ -57,6 +57,7 @@ jobs:
           if ($configs.Count -ne 18) {
             throw "Expected 18 camera configurations, found $($configs.Count)."
           }
+          ./build/verify-release-runtime.ps1 -PackagePath artifacts/package
       - name: Create installer and archives
         shell: pwsh
         run: |
