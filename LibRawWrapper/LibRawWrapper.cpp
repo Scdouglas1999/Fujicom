@@ -142,10 +142,10 @@ int RawProcessor::ProcessRawBuffer(
                 if (processed->type != LIBRAW_IMAGE_BITMAP || processed->colors < 3 || processed->bits != 16)
                     return LIBRAW_DATA_ERROR;
 
-                // Fujifilm RAFs expose a 48-column optical-black/overscan strip through
-                // LibRaw. Use the same active-area correction as the NINA plugin.
+                // The processed bitmap already uses LibRaw's active image area.
+                // Its width can exceed the camera's advertised size by a small border.
                 int sourceWidth = processed->width;
-                width = sourceWidth > 48 ? sourceWidth - 48 : sourceWidth;
+                width = sourceWidth;
                 if ((width & 1) != 0) --width;
                 height = processed->height;
                 if (width <= 0 || height <= 0) return LIBRAW_DATA_ERROR;
