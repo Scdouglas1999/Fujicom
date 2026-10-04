@@ -144,6 +144,7 @@
     <ClInclude Include="Dependencies\LibRaw-0.21.4\libraw\libraw_version.h" />
     <ClInclude Include="Dependencies\LibRaw-0.21.4\lib\libraw.lib" />
     <ClInclude Include="LibRawWrapper.h" />
+    <ClInclude Include="NativeBayerArea.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>

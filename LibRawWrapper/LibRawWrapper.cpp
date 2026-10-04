@@ -15,6 +15,7 @@
 
 // Include the header for the managed class definition
 #include "LibRawWrapper.h"
+#include "NativeBayerArea.h"
 
 
 // Use namespaces at the top level for clarity
@@ -142,10 +143,10 @@ int RawProcessor::ProcessRawBuffer(
                 if (processed->type != LIBRAW_IMAGE_BITMAP || processed->colors < 3 || processed->bits != 16)
                     return LIBRAW_DATA_ERROR;
 
-                // Fujifilm RAFs expose a 48-column optical-black/overscan strip through
-                // LibRaw. Use the same active-area correction as the NINA plugin.
+                // The processed bitmap already uses LibRaw's active image area.
+                // Its width can exceed the camera's advertised size by a small border.
                 int sourceWidth = processed->width;
-                width = sourceWidth > 48 ? sourceWidth - 48 : sourceWidth;
+                width = sourceWidth;
                 if ((width & 1) != 0) --width;
                 height = processed->height;
                 if (width <= 0 || height <= 0) return LIBRAW_DATA_ERROR;
@@ -181,21 +182,18 @@ int RawProcessor::ProcessRawBuffer(
             return ret;
         }
         int sourceWidth = lr->sizes.raw_width;
-        int sourceHeight = lr->sizes.raw_height;
-        int left = lr->sizes.left_margin;
-        int top = lr->sizes.top_margin;
-        width = lr->sizes.width > 48 ? lr->sizes.width - 48 : lr->sizes.width;
-        if ((width & 1) != 0) --width;
-        height = lr->sizes.height;
-
-
-        if (width <= 0 || height <= 0)
+        NativeBayerArea area;
+        if (!TryGetNativeBayerArea(lr->sizes, area))
         {
             ret = LIBRAW_DATA_ERROR;
             libraw_close(lr);
             lr = nullptr;
             return ret;
         }
+        int left = area.left;
+        int top = area.top;
+        width = area.width;
+        height = area.height;
 
         // 5. Get pointer to raw Bayer data (Direct struct access is fine)
         // Check if raw_image is valid
@@ -218,14 +216,6 @@ int RawProcessor::ProcessRawBuffer(
             return ret;
         }
         bayerData = gcnew array<System::UInt16, 2>(height, width);
-
-        if (left < 0 || top < 0 || left + width > sourceWidth || top + height > sourceHeight)
-        {
-            ret = LIBRAW_DATA_ERROR;
-            libraw_close(lr);
-            lr = nullptr;
-            return ret;
-        }
 
         // 7. Copy the active sensor area from the native buffer to the managed array.
         pin_ptr<System::UInt16> pinnedBayerData = &bayerData[0, 0];
