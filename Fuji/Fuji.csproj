@@ -395,7 +395,10 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="CopyRequiredFiles" AfterTargets="Build">
     <ItemGroup>
-      <_SourceDlls Include="$(MSBuildProjectDirectory)\RequiredDLL\*.*" />
+      <!-- The project reference supplies the freshly built Release wrapper. The checked-in
+           copy is debug-linked and must never replace it in the release package. -->
+      <_SourceDlls Include="$(MSBuildProjectDirectory)\RequiredDLL\*.*"
+                   Exclude="$(MSBuildProjectDirectory)\RequiredDLL\LibRawWrapper.dll" />
       <_SourceHeaders Include="$(MSBuildProjectDirectory)\RequiredHeaders\*.*" />
       <_SourceConfigs Include="$(MSBuildProjectDirectory)\CameraConfigs\*.*" />
       <_SourceSdkData Include="$(MSBuildProjectDirectory)\DLL and Headers\XSDK.DAT" />
