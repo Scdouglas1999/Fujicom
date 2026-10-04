@@ -1,3 +1,29 @@
+# Fujicom 3.0.2
+
+Fixes the Release DLL packaging failure reported in #10 and image-size mismatches in SharpCap. Includes #11 and #12, contributed by @roma-derski, with additional runtime-verifier and native GFX regression fixes.
+
+## Fixes
+
+- Prevent the checked-in debug `LibRawWrapper.dll` from replacing the freshly built Release wrapper. Both Release configurations explicitly use the Release Visual C++ runtime.
+- Reject packages containing Visual C++ debug runtime dependencies, including numbered and named component DLLs such as `VCRUNTIME140_1D.dll` and `MSVCP140D_ATOMIC_WAIT.dll`.
+- Return ASCOM image arrays at the camera's advertised dimensions, using even crop offsets to preserve Bayer color alignment.
+- Remove the extra 48-column trim from both processed X-Trans images and native Bayer/GFX active areas. Preserve LibRaw's native-area origin and validate its bounds before allocating the image.
+- Add native GFX active-area regression tests, broader managed crop tests, and 21 runtime-verifier checks to CI.
+
+## Updating
+
+Use `Fujicom.Setup.v3.0.2.exe` for Windows x64. ASCOM Platform, .NET Framework 4.7.2 or newer, and the Microsoft Visual C++ x64 Redistributable remain prerequisites; Visual Studio debug runtimes are not required.
+
+Image dimensions can differ from earlier Fujicom versions. Use matching capture settings and driver versions for lights and calibration frames. X-Trans output remains synthetic RGGB for ASCOM compatibility; retain native RAFs for calibration-sensitive workflows.
+
+## Validation
+
+- Linux and Windows core checks, managed compilation, Windows x64 C++/CLI compilation, runtime dependency checks, and installer packaging passed.
+- 11 core checks, native Bayer geometry tests, and 21 runtime-verifier checks passed.
+- SDK verification passed for 25 XAPI exports, 7 LibRaw exports, and 5 signature/constant contracts.
+- Local GFX100S and X-T5 RAF replays using LibRaw 0.21.4 and the production geometry/crop helpers produced 11648 x 8736 and 7728 x 5152 respectively, with every output pixel checked against its expected source position. This replay does not exercise Windows C++/CLI loading or the camera's USB protocol.
+- The contributor reported 458 successful X-T4 captures through SharpCap for the original image-dimension fix. No new physical-camera capture session was performed for the final 3.0.2 build.
+
 # Fujicom 3.0.1
 
 Bug-fix release for the 3.0.0 connection failure reported in GitHub issue #8 (`Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')`), seen in NINA with the X-T4 and X-H2S.

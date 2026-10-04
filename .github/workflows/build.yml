@@ -72,8 +72,8 @@ jobs:
           Get-ChildItem artifacts/package -Filter *.pdb | Copy-Item -Destination artifacts/symbols
           Get-ChildItem artifacts/package -Filter *.pdb | Remove-Item
           Get-ChildItem artifacts/package -Filter *.metagen | Remove-Item
-          Compress-Archive -Path artifacts/package/* -DestinationPath artifacts/release/Fujicom-v3.0.1-runtime.zip
-          Compress-Archive -Path artifacts/symbols/* -DestinationPath artifacts/release/Fujicom-v3.0.1-symbols.zip
+          Compress-Archive -Path artifacts/package/* -DestinationPath artifacts/release/Fujicom-v3.0.2-runtime.zip
+          Compress-Archive -Path artifacts/symbols/* -DestinationPath artifacts/release/Fujicom-v3.0.2-symbols.zip
           choco install innosetup --no-progress -y
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer/Fujicom.iss
           Get-ChildItem artifacts/release -File | ForEach-Object {
@@ -82,6 +82,6 @@ jobs:
           } | Set-Content artifacts/release/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: Fujicom-v3.0.1-release
+          name: Fujicom-v3.0.2-release
           path: artifacts/release/*
           if-no-files-found: error

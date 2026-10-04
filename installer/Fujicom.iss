@@ -1,4 +1,4 @@
-#define AppVersion "3.0.1"
+#define AppVersion "3.0.2"
 #define BuildRoot "..\artifacts\package"
 
 [Setup]
