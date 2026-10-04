@@ -148,6 +148,13 @@ internal static class Program
     {
         Equal(72, ActiveFrameCropper.EvenCenteredOffset(6384, 6240));
         Equal(10, ActiveFrameCropper.EvenCenteredOffset(4182, 4160));
+        // LibRaw 0.21.4 GFX100S active area, retained by NativeBayerArea.h.
+        // Cropping to the configured 11648 x 8736 keeps both offsets even.
+        Equal(6, ActiveFrameCropper.EvenCenteredOffset(11662, 11648));
+        Equal(8, ActiveFrameCropper.EvenCenteredOffset(8752, 8736));
+        // X-T5 processed bitmap measured with the same LibRaw version.
+        Equal(12, ActiveFrameCropper.EvenCenteredOffset(7752, 7728));
+        Equal(16, ActiveFrameCropper.EvenCenteredOffset(5184, 5152));
 
         var source = new ushort[8, 10];
         for (int y = 0; y < 8; y++)
@@ -161,7 +168,16 @@ internal static class Program
         Equal(4, cropped.GetLength(1));
         Equal(202, cropped[0, 0]);
         Equal(505, cropped[3, 3]);
+        var unchanged = ActiveFrameCropper.ToAscomArray(source, 10, 8, out left, out top);
+        Equal(0, left);
+        Equal(0, top);
+        for (int y = 0; y < 8; y++)
+            for (int x = 0; x < 10; x++)
+                Equal((int)source[y, x], unchanged[x, y]);
         Throws<InvalidOperationException>(() => ActiveFrameCropper.ToAscomArray(source, 11, 4, out _, out _));
+        Throws<InvalidOperationException>(() => ActiveFrameCropper.ToAscomArray(source, 4, 9, out _, out _));
+        Throws<InvalidOperationException>(() => ActiveFrameCropper.ToAscomArray(source, 0, 4, out _, out _));
+        Throws<ArgumentNullException>(() => ActiveFrameCropper.ToAscomArray(null, 4, 4, out _, out _));
     }
 
     private static void WriteConfig(string root, string model, int minIso)

@@ -13,6 +13,10 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Test native Bayer active area
+        run: |
+          g++ -std=c++11 -Wall -Wextra -Werror -I LibRawWrapper/Dependencies/LibRaw-0.21.4/libraw tests/NativeBayerArea.Tests.cpp -o "$RUNNER_TEMP/native-bayer-tests"
+          "$RUNNER_TEMP/native-bayer-tests"
       - name: Run driver core tests
         run: dotnet run --project tests/Fujicom.Core.Tests/Fujicom.Core.Tests.csproj --configuration Release
       - name: Compile ASCOM C# driver
