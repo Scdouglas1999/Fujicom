@@ -5,7 +5,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $package = (Resolve-Path -LiteralPath $PackagePath).Path
-$debugRuntime = [regex]::new('(?i)\b(?:msvcp\d+d|vcruntime\d+d|concrt\d+d|ucrtbased)\.dll\b')
+# Debug suffixes can follow a component number (_1d) or precede a named
+# component (d_atomic_wait). Release names such as vcruntime140_1 stay valid.
+$debugRuntime = [regex]::new('(?i)\b(?:(?:msvcp|vcruntime|concrt)\d+(?:_\d+)*d(?:_[a-z0-9]+)*|ucrtbased)\.dll\b')
 
 foreach ($name in @('LibRawWrapper.dll', 'libraw.dll')) {
     $path = Join-Path $package $name

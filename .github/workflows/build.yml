@@ -30,6 +30,9 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - uses: microsoft/setup-msbuild@v2
+      - name: Test release-runtime verifier
+        shell: pwsh
+        run: ./tests/VerifyReleaseRuntime.Tests.ps1
       - name: Run core tests
         run: dotnet run --project tests/Fujicom.Core.Tests/Fujicom.Core.Tests.csproj --configuration Release
       - name: Restore Windows solution
